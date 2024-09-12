@@ -53,6 +53,34 @@ function createTodoElement(item) {
     removeBtnEl.classList.add('material-icons', 'remove-btn');
     removeBtnEl.innerText = 'remove_circles';
 
+    checkboxEl.addEventListener('change', () => {
+        item.complete = checkboxEl.checked;
+        
+        if(item.complete) {
+            itemEl.classList.add('complete');
+        } else {
+            itemEl.classList.remove('complete');
+        }
+    });
+
+    inputEl.addEventListener('blur', () => {
+        inputEl.setAttribute('disabled', '');
+    });
+
+    inputEl.addEventListener('input', () => {
+        item.text = inputEl.value;
+    });
+
+    editBtnEl.addEventListener('click', () => {
+        inputEl.removeAttribute('disabled');
+        inputEl.focus();
+    });
+
+    removeBtnEl.addEventListener('click', () => {
+        todos.filter(t => t.id !== item.id)
+        itemEl.remove();
+    });
+
     itemEl.append(checkboxEl);
     itemEl.append(inputEl);
     itemEl.append(actionsEl);
