@@ -5,6 +5,8 @@ const COLS = 10;
 const spreadsheet = [];
 const alphabets = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 
+const exportBtn = document.querySelector("#export-btn");
+
 class Cell {
   constructor(
     isHeader,
@@ -56,7 +58,16 @@ function initSpreadsheet() {
       const rowName = i;
       const columnName = alphabets[j - 1];
 
-      const cell = new Cell(isHeader, disabled, cellData, i, j, false);
+      const cell = new Cell(
+        isHeader,
+        disabled,
+        cellData,
+        i,
+        j,
+        rowName,
+        columnName,
+        false
+      );
       spreadsheetRow.push(cell);
     }
     spreadsheet.push(spreadsheetRow);
@@ -76,6 +87,7 @@ function createCellEl(cell) {
     cellEl.classList.add("header");
   }
   cellEl.onclick = () => handleCellClick(cell);
+  cellEl.onchange = (e) => handleOnChange(e.target.value, cell);
 
   return cellEl;
 }
@@ -88,6 +100,8 @@ function handleCellClick(cell) {
   const rowHeaderEl = getElFromRowCol(rowHeader.row, rowHeader.column);
   columnHeaderEl.classList.add("active");
   rowHeaderEl.classList.add("active");
+  document.querySelector("#cell-status").innerHTML =
+    cell.columnName + "" + cell.rowName;
 }
 
 function clearHeaderActiveStates() {
@@ -114,3 +128,27 @@ function drawSheet() {
     spreadSheetContainer.append(rowContainerEl);
   }
 }
+
+function handleOnChange(data, cell) {
+  cell.data = data;
+}
+
+exportBtn.onclick = function (e) {
+  let csv = "";
+  for (let i = 0; i < spreadsheet.length; i++) {
+    if (i === 0) continue;
+    csv +=
+      spreadsheet[i]
+        .filter((item) => !item.isHeader)
+        .map((item) => item.data)
+        .join(",") + "\r\n";
+  }
+
+  const csvObj = new Blob([csv]);
+  const csvUrl = URL.createObjectURL(csvObj);
+
+  const a = document.createElement("a");
+  a.href = csvUrl;
+  a.download = "spreadsheet File Name.csv";
+  a.click();
+};
